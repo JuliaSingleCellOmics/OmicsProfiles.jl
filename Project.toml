@@ -12,8 +12,9 @@ TranscodingStreams = "3bb67fe8-82b1-5028-8e26-92a6c54297fa"
 julia = "1.6"
 
 [extras]
+CodecZlib = "944b1d66-785c-5afd-91f1-9de20f533193"
 SHA = "ea8e919c-243c-51af-8825-aaa63cd721ce"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [targets]
-test = ["SHA", "Test"]
+test = ["CodecZlib", "SHA", "Test"]

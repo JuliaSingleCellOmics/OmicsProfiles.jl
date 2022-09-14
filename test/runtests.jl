@@ -1,6 +1,7 @@
 using OmicsProfiles
 using SparseArrays
 using SHA
+using CodecZlib
 using Test
 
 tests = [

@@ -229,12 +229,17 @@ Write a sparse matrix to .mtx file format.
 - `matrix::SparseMatrixCSC`: The sparse matrix to write.
 """
 function mmwrite(filename::String, matrix::SparseMatrixCSC)
-    file = open(filename, "w")
+    stream = open(filename, "w")
+    mmwrite(stream, matrix)
+    close(stream)
+end
+
+function mmwrite(stream::IO, matrix::SparseMatrixCSC)
     elem = generate_eltype(eltype(matrix))
     sym = generate_symmetric(matrix)
 
     # write header
-    write(file, "%%MatrixMarket matrix coordinate $elem $sym\n")
+    write(stream, "%%MatrixMarket matrix coordinate $elem $sym\n")
 
     # only use lower triangular part of symmetric and Hermitian matrices
     if issymmetric(matrix) || ishermitian(matrix)
@@ -242,15 +247,14 @@ function mmwrite(filename::String, matrix::SparseMatrixCSC)
     end
 
     # write matrix size and number of nonzeros
-    write(file, "$(size(matrix, 1)) $(size(matrix, 2)) $(nnz(matrix))\n")
+    write(stream, "$(size(matrix, 1)) $(size(matrix, 2)) $(nnz(matrix))\n")
 
     rows = rowvals(matrix)
     vals = nonzeros(matrix)
     for i in 1:size(matrix, 2)
         for j in nzrange(matrix, i)
             entity = generate_entity(i, j, rows, vals, elem)
-            write(file, entity)
+            write(stream, entity)
         end
     end
-    close(file)
 end
