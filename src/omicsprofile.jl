@@ -20,7 +20,7 @@ julia> r, c = (100, 500)
 
 julia> data = rand(0:100, r, c);
 
-julia> var = DataFrame(index=1:r, C=rand(r), D=rand(r))
+julia> var = DataFrame(index=1:r, C=rand(r), D=rand(r));
 
 julia> prof = OmicsProfile(data, var, :index)
 OmicsProfile (nvar = 100):
