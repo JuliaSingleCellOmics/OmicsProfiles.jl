@@ -101,6 +101,12 @@ function setpipeline!(p::OmicsProfile, x, i::Symbol)
     return p
 end
 
+function geneexpr(p::OmicsProfile, gene_name, layer::Symbol=:count)
+    varindex = getvarindex(p)
+    idx = findall(p.var[!, varindex] .== gene_name)
+    return view(getlayer(p, layer), idx, :)
+end
+
 function Base.getindex(p::OmicsProfile, inds...)
     new_prof = OmicsProfile(getindex(countmatrix(p), inds[1], inds[2]),
                  getindex(p.var, inds[1], :),

@@ -32,7 +32,7 @@ export
     setlayer!,
     getpipeline,
     setpipeline!,
-    get_gene_expr,
+    geneexpr,
 
     # annotatedProfile
     AnnotatedProfile,

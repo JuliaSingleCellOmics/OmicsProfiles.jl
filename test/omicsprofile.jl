@@ -43,4 +43,7 @@
     @test getpipeline(prof, :log_transform)[:c] == 3
 
     @test repr(prof) == "OmicsProfile (nvar = 100):\n    var: index, A, B\n    layers: a, b, count\n    pipeline: qc_metrics => normalize => log_transform"
+
+    @test vec(geneexpr(prof, 50)) == data[50, :]
+    @test vec(geneexpr(prof, 50, :a)) == prof.layers[:a][50, :]
 end
