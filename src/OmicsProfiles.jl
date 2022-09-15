@@ -18,15 +18,26 @@ const FEATURE_COLS = [:featurekey, :featurename, :featuretype, :chromosome, :fea
 
 export
     # omicsprofile
+    AbstractProfile,
     OmicsProfile,
-    obsnames,
-    varnames,
-    layernames,
+    countmatrix,
     nrow,
     ncol,
     nvar,
-    nobs,
-    get_gene_expr
+    varnames,
+    getvarindex,
+    setvarindex!,
+    layernames,
+    getlayer,
+    setlayer!,
+    getpipeline,
+    setpipeline!,
+    get_gene_expr,
+
+    # annotatedProfile
+    AnnotatedProfile,
+    obsnames,
+    nobs
 
 
 include("mtx.jl")

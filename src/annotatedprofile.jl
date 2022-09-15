@@ -1,8 +1,8 @@
-mutable struct AnnotatedProfile <: AbstractProfile
+struct AnnotatedProfile <: AbstractProfile
     omics::Dict{Symbol,OmicsProfile}
     obs::DataFrame
-    obsindex::Symbol
-    obsm
+    obsindex::Ref{Symbol}
+    obsm::Dict{Symbol,AbstractMatrix}
     obsgraphs::Dict{Symbol,AbstractGraph}
     pipeline::OrderedDict{Symbol,Dict}
 end
@@ -10,10 +10,10 @@ end
 function AnnotatedProfile(omics::Dict{Symbol,OmicsProfile}, obs::DataFrame, obsindex::Symbol,
         )
     @assert all(nrow(obs) == ncol(p) for p in values(omics)) "all omics data should have the same number of observations with `obs`."
-    obsm
+    obsm = Dict{Symbol,AbstractMatrix}()
     obsgraphs = Dict{Symbol,AbstractGraph}()
     pipeline = OrderedDict{Symbol,Dict}()
-    return AnnotatedProfile(omics, obs, obsindex, obsm, obsgraphs, pipeline)
+    return AnnotatedProfile(omics, obs, Ref(obsindex), obsm, obsgraphs, pipeline)
 end
 
 function AnnotatedProfile(p::OmicsProfile, omicsname, obs::DataFrame, obsindex::Symbol)
@@ -37,7 +37,7 @@ nvar(p::AnnotatedProfile, kind::Symbol) = nvar(p.omics[kind])
 nobs(p::AnnotatedProfile) = nrow(p.obs)
 
 function Base.show(io::IO, p::AnnotatedProfile)
-    println(io, "AnnotatedProfile: n_obs = ", nobs(p))
+    println(io, "AnnotatedProfile (nobs = ", nobs(p), "):")
     isempty(p.obs) || println(io, "    obs: ", join(obsnames(p), ", "))
     isempty(p.pipeline) || println(io, "    pipeline: ", join(keys(p.pipeline), " => "))
     for (kind, omic) in p.omics

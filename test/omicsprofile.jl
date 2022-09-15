@@ -1,64 +1,46 @@
 @testset "omicsprofile" begin
     r, c = (100, 500)
     data = rand(0:10, r, c)
-    obs = DataFrame(index=1:c, A=rand(c), B=rand(c))
-    var = DataFrame(index=1:r, C=rand(r), D=rand(r))
-    @test_throws AssertionError OmicsProfile(data, obs, var)
+    var = DataFrame(index=1:r, C=rand(r), D=repeat([1], r))
+    @test_throws AssertionError OmicsProfile(data[1:50, :], var, :index)
 
-    prof = OmicsProfile(data, var, obs)
-    prof.layers[:a] = rand(r, c)
-    prof.layers[:b] = rand(c, r)
-    @test obsnames(prof) == ["index", "A", "B"]
+    prof = OmicsProfile(data, var, :index)
     @test varnames(prof) == ["index", "C", "D"]
+    @test countmatrix(prof) == data
+    @test getvarindex(prof) == :index
     @test nrow(prof) == r
     @test ncol(prof) == c
     @test nvar(prof) == r
-    @test nobs(prof) == c
     @test maximum(prof) == 10
     @test minimum(prof) == 0
     @test size(prof) == (r, c)
     @test axes(prof) == (Base.OneTo(r), Base.OneTo(c))
-    @test_throws AssertionError prof.obs = var
-    @test_throws AssertionError prof.var = obs
-    @test size(prof.layers[:a]) == (r, c)
-    @test size(prof.layers[:b]) == (c, r)
-    @test vec(get_gene_expr(prof, 50)) == data[50, :]
-    @test vec(get_gene_expr(prof, 50, :a)) == prof.layers[:a][50, :]
-    @test isempty(get_gene_expr(prof, r+11, :a))
 
     prof2 = copy(prof)
     @test prof2 !== prof
-    @test prof.data == prof2.data
+    @test countmatrix(prof) == countmatrix(prof2)
     @test prof.var == prof2.var
-    @test prof.obs == prof2.obs
-    
-    prof2 = filter(:C => x -> x > 0, prof)
-    @test prof2 !== prof
-    @test prof2.var == prof.var[prof.var.C .> 0, :]
-    @test prof2.data == prof.data[prof.var.C .> 0, :]
-    @test prof2.obs == prof.obs
-    @test prof2.layers[:a] == prof.layers[:a][prof.var.C .> 0, :]
-    @test prof2.layers[:b] == prof.layers[:b]
 
-    filter!(:C => x -> x > 0, prof2)
-    @test prof2.var == prof.var[prof.var.C .> 0, :]
-    @test prof2.data == prof.data[prof.var.C .> 0, :]
-    @test prof2.obs == prof.obs
-    @test prof2.layers[:a] == prof.layers[:a][prof.var.C .> 0, :]
-    @test prof2.layers[:b] == prof.layers[:b]
+    prof.var[!, :newindex] = collect(r:-1:1)
+    setvarindex!(prof, :newindex)
+    @test getvarindex(prof) == :newindex
+    @test_throws ArgumentError setvarindex!(prof, :D)
+    setvarindex!(prof, :index)
+    select!(prof.var, Not(:newindex))
 
-    prof2 = prof[1:50, :]
-    @test prof2.data == prof.data[1:50, :]
+    setlayer!(prof, rand(r, c), :a)
+    setlayer!(prof, rand(r, r), :b)
+    @test collect(layernames(prof)) == [:a, :b, :count]
+    @test size(getlayer(prof, :a)) == (r, c)
+    @test size(getlayer(prof, :b)) == (r, r)
 
-    idx = rand([false,true], r)
-    prof3 = prof[idx, :]
-    @test prof3.data == prof.data[idx, :]
-    @test prof3.var == prof.var[idx, :]
-    @test prof3.obs == prof.obs
+    setpipeline!(prof, Dict(:a => 1), :qc_metrics)
+    setpipeline!(prof, Dict(:b => 2), :normalize)
+    setpipeline!(prof, Dict(:c => 3), :log_transform)
+    @test collect(keys(prof.pipeline)) == [:qc_metrics, :normalize, :log_transform]
+    @test getpipeline(prof, :qc_metrics)[:a] == 1
+    @test getpipeline(prof, :normalize)[:b] == 2
+    @test getpipeline(prof, :log_transform)[:c] == 3
 
-    idx2 = rand([false,true], c)
-    prof4 = prof[:, idx2]
-    @test prof4.data == prof.data[:, idx2]
-    @test prof4.var == prof.var
-    @test prof4.obs == prof.obs[idx2, :]
+    @test repr(prof) == "OmicsProfile (nvar = 100):\n    var: index, C, D\n    layers: a, b, count\n    pipeline: qc_metrics => normalize => log_transform"
 end
