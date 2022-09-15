@@ -36,8 +36,12 @@ export
 
     # annotatedProfile
     AnnotatedProfile,
+    Profile,
     obsnames,
-    nobs
+    omicsnames,
+    nobs,
+    getobsindex,
+    setobsindex!
 
 
 include("mtx.jl")

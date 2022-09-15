@@ -8,6 +8,7 @@ using Test
 tests = [
     "mtx",
     "omicsprofile",
+    "annotatedprofile",
 ]
 
 @testset "OmicsProfiles.jl" begin

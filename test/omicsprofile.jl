@@ -1,11 +1,11 @@
 @testset "omicsprofile" begin
     r, c = (100, 500)
     data = rand(0:10, r, c)
-    var = DataFrame(index=1:r, C=rand(r), D=repeat([1], r))
+    var = DataFrame(index=1:r, A=rand(r), B=repeat([1], r))
     @test_throws AssertionError OmicsProfile(data[1:50, :], var, :index)
 
     prof = OmicsProfile(data, var, :index)
-    @test varnames(prof) == ["index", "C", "D"]
+    @test varnames(prof) == ["index", "A", "B"]
     @test countmatrix(prof) == data
     @test getvarindex(prof) == :index
     @test nrow(prof) == r
@@ -42,5 +42,5 @@
     @test getpipeline(prof, :normalize)[:b] == 2
     @test getpipeline(prof, :log_transform)[:c] == 3
 
-    @test repr(prof) == "OmicsProfile (nvar = 100):\n    var: index, C, D\n    layers: a, b, count\n    pipeline: qc_metrics => normalize => log_transform"
+    @test repr(prof) == "OmicsProfile (nvar = 100):\n    var: index, A, B\n    layers: a, b, count\n    pipeline: qc_metrics => normalize => log_transform"
 end
