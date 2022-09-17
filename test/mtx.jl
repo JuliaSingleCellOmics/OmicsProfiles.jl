@@ -24,11 +24,11 @@
         OmicsProfiles.mmwrite(newfilename, res)
 
         f = open(mtx_filename)
-        sha_test = bytes2hex(sha256(read(f)))
+        sha_test = bytes2hex(sha256(read(f, String)))
         close(f)
 
         f = open(newfilename)
-        sha_new = bytes2hex(sha256(read(f)))
+        sha_new = bytes2hex(sha256(read(f, String)))
         close(f)
 
         @test sha_test == sha_new
@@ -59,11 +59,12 @@
         end
 
         stream = GzipDecompressorStream(open(gz_filename))
-        sha_test = bytes2hex(sha256(read(stream)))
+        adjusted_content = replace(read(stream, String), "\n" => OmicsProfiles.get_newline())
+        sha_test = bytes2hex(sha256(adjusted_content))
         close(stream)
 
         stream = GzipDecompressorStream(open(newfilename))
-        sha_new = bytes2hex(sha256(read(stream)))
+        sha_new = bytes2hex(sha256(read(stream, String)))
         close(stream)
 
         @test sha_test == sha_new

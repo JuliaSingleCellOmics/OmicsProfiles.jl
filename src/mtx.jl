@@ -90,7 +90,7 @@ function readinfo(filename::String)
 end
 
 function readinfo(stream::IO)
-    firstline = chomp(readuntil(stream, get_newline()))
+    firstline = chomp(readline(stream))
     if !startswith(firstline, "%%MatrixMarket")
         throw(FileFormatException("Expected start of header `%%MatrixMarket`"))
     end
@@ -105,11 +105,11 @@ function readinfo(stream::IO)
         throw(FileFormatException("Unknown MatrixMarket data type: $head1 (only `matrix` is supported)"))
     end
 
-    dimline = readuntil(stream, get_newline())
+    dimline = readline(stream)
 
     # Skip all comments and empty lines
     while length(chomp(dimline)) == 0 || (length(dimline) > 0 && dimline[1] == '%')
-        dimline = readuntil(stream, get_newline())
+        dimline = readline(stream)
     end
     rows, cols, entries = parse_dimension(dimline, rep)
 
@@ -117,7 +117,7 @@ function readinfo(stream::IO)
 end
 
 """
-    mmread(filename, retcoord::Bool=false)
+    mmread(filename, retcoord=false)
 
 Read the contents of the Matrix Market file `filename` into a matrix, which will be either
 sparse or dense, depending on the Matrix Market format indicated by `coordinate` (coordinate
@@ -126,9 +126,8 @@ sparse storage), or `array` (dense array storage).
 # Arguments
 
 - `filename::String`: The file to read.
-
-If `retcoord` is `true`, the rows, column and value vectors are returned, if it is a sparse
-matrix, along with the header information.
+- `retcoord::Bool`: If it is `true`, the rows, column and value vectors are returned along
+    with the header information.
 """
 function mmread(filename::String, retcoord::Bool=false)
     stream = open(filename, "r")
@@ -142,7 +141,7 @@ function mmread(filename::String, retcoord::Bool=false)
         cn = Vector{Int}(undef, entries)
         vals = Vector{T}(undef, entries)
         for i in 1:entries
-            line = readuntil(stream, get_newline())
+            line = readline(stream)
             splits = find_splits(line, num_splits(T))
             rn[i] = parse_row(line, splits)
             cn[i] = parse_col(line, splits, T)
@@ -152,7 +151,7 @@ function mmread(filename::String, retcoord::Bool=false)
         result = retcoord ? (rn, cn, vals, rows, cols, entries, rep, field, symm) :
                             symfunc(sparse(rn, cn, vals, rows, cols))
     else
-        vals = [parse(Float64, readuntil(stream, get_newline())) for _ in 1:entries]
+        vals = [parse(Float64, readline(stream)) for _ in 1:entries]
         A = reshape(vals, rows, cols)
         result = symfunc(A)
     end
@@ -209,12 +208,13 @@ function generate_symmetric(m::AbstractMatrix)
 end
 
 function generate_entity(i, j, rows, vals, kind::String)
+    nl = get_newline()
     if kind == "pattern"
-        return "$(rows[j]) $i\n"
+        return "$(rows[j]) $i$nl"
     elseif kind == "complex"
-        return "$(rows[j]) $i $(real(vals[j])) $(imag(vals[j]))\n"
+        return "$(rows[j]) $i $(real(vals[j])) $(imag(vals[j]))$nl"
     else
-        return "$(rows[j]) $i $(vals[j])\n"
+        return "$(rows[j]) $i $(vals[j])$nl"
     end
 end
 
@@ -235,11 +235,12 @@ function mmwrite(filename::String, matrix::SparseMatrixCSC)
 end
 
 function mmwrite(stream::IO, matrix::SparseMatrixCSC)
+    nl = get_newline()
     elem = generate_eltype(eltype(matrix))
     sym = generate_symmetric(matrix)
 
     # write header
-    write(stream, "%%MatrixMarket matrix coordinate $elem $sym\n")
+    write(stream, "%%MatrixMarket matrix coordinate $elem $sym$nl")
 
     # only use lower triangular part of symmetric and Hermitian matrices
     if issymmetric(matrix) || ishermitian(matrix)
@@ -247,7 +248,7 @@ function mmwrite(stream::IO, matrix::SparseMatrixCSC)
     end
 
     # write matrix size and number of nonzeros
-    write(stream, "$(size(matrix, 1)) $(size(matrix, 2)) $(nnz(matrix))\n")
+    write(stream, "$(size(matrix, 1)) $(size(matrix, 2)) $(nnz(matrix))$nl")
 
     rows = rowvals(matrix)
     vals = nonzeros(matrix)
