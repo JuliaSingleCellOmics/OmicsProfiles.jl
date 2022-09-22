@@ -74,7 +74,12 @@ function Base.show(io::IO, p::AnnotatedProfile)
     end
 end
 
-# Base.copy(p::AnnotatedProfile)
+==(p1::AnnotatedProfile, p2::AnnotatedProfile) = p1.omics == p2.omics &&
+    p1.obs == p2.obs && getobsindex(p1) == getobsindex(p2) && p1.obsm == p2.obsm &&
+    p1.obsgraphs == p2.obsgraphs && p1.pipeline == p2.pipeline
+
+Base.copy(p::AnnotatedProfile) = AnnotatedProfile(copy(p.omics), copy(p.obs),
+    Ref(getobsindex(p)), copy(p.obsm), copy(p.obsgraphs), copy(p.pipeline))
 
 getobsindex(p::AnnotatedProfile) = p.obsindex[]
 

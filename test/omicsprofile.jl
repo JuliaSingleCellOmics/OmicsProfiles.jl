@@ -1,38 +1,37 @@
 @testset "omicsprofile" begin
-    r, c = (100, 500)
-    data = rand(0:10, r, c)
-    var = DataFrame(index=1:r, A=rand(r), B=repeat([1], r))
+    ngenes, ncells = (100, 500)
+    data = rand(0:10, ngenes, ncells)
+    var = DataFrame(index=1:ngenes, A=rand(ngenes), B=repeat([1], ngenes))
     @test_throws AssertionError OmicsProfile(data[1:50, :], var, :index)
 
     prof = OmicsProfile(data, var, :index)
     @test varnames(prof) == ["index", "A", "B"]
     @test countmatrix(prof) == data
     @test getvarindex(prof) == :index
-    @test nrow(prof) == r
-    @test ncol(prof) == c
-    @test nvar(prof) == r
+    @test nrow(prof) == ngenes
+    @test ncol(prof) == ncells
+    @test nvar(prof) == ngenes
     @test maximum(prof) == 10
     @test minimum(prof) == 0
-    @test size(prof) == (r, c)
-    @test axes(prof) == (Base.OneTo(r), Base.OneTo(c))
+    @test size(prof) == (ngenes, ncells)
+    @test axes(prof) == (Base.OneTo(ngenes), Base.OneTo(ncells))
 
     prof2 = copy(prof)
     @test prof2 !== prof
-    @test countmatrix(prof) == countmatrix(prof2)
-    @test prof.var == prof2.var
+    @test prof == prof2
 
-    prof.var[!, :newindex] = collect(r:-1:1)
+    prof.var[!, :newindex] = collect(ngenes:-1:1)
     setvarindex!(prof, :newindex)
     @test getvarindex(prof) == :newindex
     @test_throws ArgumentError setvarindex!(prof, :D)
     setvarindex!(prof, :index)
     select!(prof.var, Not(:newindex))
 
-    setlayer!(prof, rand(r, c), :a)
-    setlayer!(prof, rand(r, r), :b)
+    setlayer!(prof, rand(ngenes, ncells), :a)
+    setlayer!(prof, rand(ngenes, ngenes), :b)
     @test collect(layernames(prof)) == [:a, :b, :count]
-    @test size(getlayer(prof, :a)) == (r, c)
-    @test size(getlayer(prof, :b)) == (r, r)
+    @test size(getlayer(prof, :a)) == (ngenes, ncells)
+    @test size(getlayer(prof, :b)) == (ngenes, ngenes)
 
     setpipeline!(prof, Dict(:a => 1), :qc_metrics)
     setpipeline!(prof, Dict(:b => 2), :normalize)

@@ -8,6 +8,7 @@ using DataStructures
 using Graphs, SimpleWeightedGraphs
 using TranscodingStreams
 
+import Base: ==
 import DataFrames: nrow, ncol
 
 const PROJECT_PATH = dirname(@__DIR__)
