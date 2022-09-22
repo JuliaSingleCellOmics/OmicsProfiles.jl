@@ -1,7 +1,7 @@
 name = "OmicsProfiles"
 uuid = "2c1f4335-9aeb-47fb-ad11-94d99429346c"
 authors = ["Yueh-Hua Tu"]
-version = "0.1.0"
+version = "0.1.1"
 
 [deps]
 DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
