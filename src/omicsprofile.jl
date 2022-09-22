@@ -66,10 +66,12 @@ function Base.show(io::IO, p::OmicsProfile)
     isempty(p.pipeline) || print(io, "\n    pipeline: ", join(keys(p.pipeline), " => "))
 end
 
-function Base.copy(p::OmicsProfile)
-    return OmicsProfile(copy(p.var), p.varindex, copy(p.varm), copy(p.vargraphs),
-        copy(p.layers), copy(p.pipeline))
-end
+==(p1::OmicsProfile, p2::OmicsProfile) = p1.var == p2.var && getvarindex(p1) == getvarindex(p2) &&
+    p1.varm == p2.varm && p1.vargraphs == p2.vargraphs && p1.layers == p2.layers &&
+    p1.pipeline == p2.pipeline
+
+Base.copy(p::OmicsProfile) = OmicsProfile(copy(p.var), p.varindex, copy(p.varm),
+    copy(p.vargraphs), copy(p.layers), copy(p.pipeline))
 
 Base.maximum(p::OmicsProfile) = maximum(countmatrix(p))
 Base.minimum(p::OmicsProfile) = minimum(countmatrix(p))
