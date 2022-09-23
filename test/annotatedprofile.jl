@@ -32,6 +32,8 @@
     @test collect(keys(ap.pipeline)) == [:merge_omics, :integration]
     @test ap.merge_omics[:a] == 1
     @test ap.integration[:b] == 2
+    ap.merge_omics = Dict(:a => 5)
+    @test ap.merge_omics[:a] == 5
 
     @test repr(ap) == "AnnotatedProfile (nobs = 500):\n    obs: barcode, C, D\n    obsm: pca\n    pipeline: merge_omics => integration" *
         "\nRNA => OmicsProfile (nvar = 100):\n    var: genesymbol, A, B\n    layers: count"

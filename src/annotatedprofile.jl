@@ -58,6 +58,7 @@ omicsnames(p::AnnotatedProfile) = keys(getfield(p, :omics))
 obsnames(p::AnnotatedProfile) = names(p.obs)
 varnames(p::AnnotatedProfile, omicsname::Symbol) = varnames(p.omics[omicsname])
 layernames(p::AnnotatedProfile, omicsname::Symbol) = layernames(p.omics[omicsname])
+pipelinenames(p::AnnotatedProfile) = keys(getfield(p, :pipeline))
 
 nvar(p::AnnotatedProfile, omicsname::Symbol) = nvar(p.omics[omicsname])
 nobs(p::AnnotatedProfile) = nrow(p.obs)
