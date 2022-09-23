@@ -49,12 +49,12 @@ function OmicsProfile(countmat::M, var::DataFrame, varindex::Symbol; T=float(elt
     return OmicsProfile(copy(var), Ref(varindex), varm, vargraphs, layers, pipeline)
 end
 
-varnames(p::OmicsProfile) = names(p.var)
-layernames(p::OmicsProfile) = keys(p.layers)
-countmatrix(p::OmicsProfile) = p.layers[:count]
+varnames(p::OmicsProfile) = names(getfield(p, :var))
+layernames(p::OmicsProfile) = keys(getfield(p, :layers))
+pipelinenames(p::OmicsProfile) = keys(getfield(p, :pipeline))
 
-nrow(p::OmicsProfile) = size(countmatrix(p), 1)
-ncol(p::OmicsProfile) = size(countmatrix(p), 2)
+nrow(p::OmicsProfile) = size(p.count, 1)
+ncol(p::OmicsProfile) = size(p.count, 2)
 nvar(p::OmicsProfile) = nrow(p.var)
 
 function Base.show(io::IO, p::OmicsProfile)
@@ -73,33 +73,33 @@ end
 Base.copy(p::OmicsProfile) = OmicsProfile(copy(p.var), p.varindex, copy(p.varm),
     copy(p.vargraphs), copy(p.layers), copy(p.pipeline))
 
-Base.maximum(p::OmicsProfile) = maximum(countmatrix(p))
-Base.minimum(p::OmicsProfile) = minimum(countmatrix(p))
+Base.maximum(p::OmicsProfile) = maximum(p.count)
+Base.minimum(p::OmicsProfile) = minimum(p.count)
 
-Base.size(p::OmicsProfile) = size(countmatrix(p))
-Base.axes(p::OmicsProfile) = axes(countmatrix(p))
+Base.size(p::OmicsProfile) = size(p.count)
+Base.axes(p::OmicsProfile) = axes(p.count)
 
-getvarindex(p::OmicsProfile) = p.varindex[]
+getvarindex(p::OmicsProfile) = getfield(p, :varindex)[]
 
 function setvarindex!(p::OmicsProfile, index::Symbol)
     not_unique = nonunique(p.var, index)
     any(not_unique) && throw(ArgumentError("not unique var index at rows: $(findall(not_unique))."))
-    p.varindex[] = index
+    getfield(p, :varindex)[] = index
     return p
 end
 
-getlayer(p::OmicsProfile, i::Symbol) = p.layers[i]
+getlayer(p::OmicsProfile, i::Symbol) = getfield(p, :layers)[i]
 
-function setlayer!(p::OmicsProfile, x, i::Symbol)
+function setlayer!(p::OmicsProfile, i::Symbol, x)
     @assert size(x, 1) == nvar(p)
-    p.layers[i] = x
+    getfield(p, :layers)[i] = x
     return p
 end
 
-getpipeline(p::OmicsProfile, i::Symbol) = p.pipeline[i]
+getpipeline(p::OmicsProfile, i::Symbol) = getfield(p, :pipeline)[i]
 
-function setpipeline!(p::OmicsProfile, x, i::Symbol)
-    p.pipeline[i] = x
+function setpipeline!(p::OmicsProfile, i::Symbol, x)
+    getfield(p, :pipeline)[i] = x
     return p
 end
 
@@ -109,14 +109,51 @@ function geneexpr(p::OmicsProfile, gene_name, layer::Symbol=:count)
     return view(getlayer(p, layer), idx, :)
 end
 
-function Base.getindex(p::OmicsProfile, inds...)
-    new_prof = OmicsProfile(getindex(countmatrix(p), inds[1], inds[2]),
-                 getindex(p.var, inds[1], :),
-                 getindex(p.obs, inds[2], :))
-    for (k, v) in p.layers
-        new_prof.layers[k] = getindex(v, inds[1], inds[2])
+function Base.getproperty(p::OmicsProfile, name::Symbol)
+    if name == :varindex
+        return getvarindex(p)
+    elseif name in keys(getfield(p, :varm))
+        return getfield(p, :varm)[name]
+    elseif name in keys(getfield(p, :vargraphs))
+        return getfield(p, :vargraphs)[name]
+    elseif name in layernames(p)
+        return getlayer(p, name)
+    elseif name in pipelinenames(p)
+        return getpipeline(p, name)
+    else
+        return getfield(p, name)
     end
-    new_prof.pipeline = copy(p.pipeline)
+end
+
+function Base.setproperty!(p::OmicsProfile, name::Symbol, x)
+    if name == :varindex
+        return setvarindex!(p, x)
+    elseif name in keys(getfield(p, :varm))
+        getfield(p, :varm)[name] = x
+        return p
+    elseif name in keys(getfield(p, :vargraphs))
+        getfield(p, :vargraphs)[name] = x
+        return p
+    elseif name in layernames(p)
+        return setlayer!(p, name, x)
+    elseif name in pipelinenames(p)
+        return setpipeline!(p, name, x)
+    else
+        return setfield!(p, name, x)
+    end
+end
+
+function Base.getindex(p::OmicsProfile, inds...)
+    new_prof = OmicsProfile(getindex(p.count, inds[1], :),
+                getindex(p.var, inds[1], :), getvarindex(p))
+    for name in layernames(p)
+        l = getindex(getlayer(p, name), inds[1], :)
+        setlayer!(new_prof, name, l)
+    end
+    for name in pipelinenames(p)
+        pl = copy(getpipeline(p, name))
+        setpipeline!(new_prof, name, pl)
+    end
     return new_prof
 end
 

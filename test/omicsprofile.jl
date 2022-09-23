@@ -1,13 +1,13 @@
 @testset "omicsprofile" begin
     ngenes, ncells = (100, 500)
     data = rand(0:10, ngenes, ncells)
-    var = DataFrame(index=1:ngenes, A=rand(ngenes), B=repeat([1], ngenes))
+    var = DataFrame(index=string.(1:ngenes), A=rand(ngenes), B=repeat([1], ngenes))
     @test_throws AssertionError OmicsProfile(data[1:50, :], var, :index)
 
     prof = OmicsProfile(data, var, :index)
     @test varnames(prof) == ["index", "A", "B"]
-    @test countmatrix(prof) == data
-    @test getvarindex(prof) == :index
+    @test prof.count == data
+    @test prof.varindex == :index
     @test nrow(prof) == ngenes
     @test ncol(prof) == ncells
     @test nvar(prof) == ngenes
@@ -21,28 +21,46 @@
     @test prof == prof2
 
     prof.var[!, :newindex] = collect(ngenes:-1:1)
-    setvarindex!(prof, :newindex)
-    @test getvarindex(prof) == :newindex
-    @test_throws ArgumentError setvarindex!(prof, :D)
-    setvarindex!(prof, :index)
+    prof.varindex = :newindex
+    @test prof.varindex == :newindex
+    @test_throws ArgumentError prof.varindex = :D
+    prof.varindex = :index
     select!(prof.var, Not(:newindex))
 
-    setlayer!(prof, rand(ngenes, ncells), :a)
-    setlayer!(prof, rand(ngenes, ngenes), :b)
+    prof.varm[:pcs] = rand(ngenes, 50)
+    @test size(prof.pcs) == (ngenes, 50)
+    prof.pcs = rand(ngenes, 80)
+    @test size(prof.pcs) == (ngenes, 80)
+
+    prof.layers[:a] = rand(ngenes, ncells)
+    prof.layers[:b] = rand(ngenes, ngenes)
     @test collect(layernames(prof)) == [:a, :b, :count]
-    @test size(getlayer(prof, :a)) == (ngenes, ncells)
-    @test size(getlayer(prof, :b)) == (ngenes, ngenes)
+    @test size(prof.a) == (ngenes, ncells)
+    @test size(prof.b) == (ngenes, ngenes)
+    prof.a = prof.count
+    @test prof.a == prof.count
 
-    setpipeline!(prof, Dict(:a => 1), :qc_metrics)
-    setpipeline!(prof, Dict(:b => 2), :normalize)
-    setpipeline!(prof, Dict(:c => 3), :log_transform)
+    prof.pipeline[:qc_metrics] = Dict(:a => 1)
+    prof.pipeline[:normalize] = Dict(:b => 2)
+    prof.pipeline[:log_transform] = Dict(:c => 3)
     @test collect(keys(prof.pipeline)) == [:qc_metrics, :normalize, :log_transform]
-    @test getpipeline(prof, :qc_metrics)[:a] == 1
-    @test getpipeline(prof, :normalize)[:b] == 2
-    @test getpipeline(prof, :log_transform)[:c] == 3
+    @test prof.qc_metrics[:a] == 1
+    @test prof.normalize[:b] == 2
+    @test prof.log_transform[:c] == 3
+    prof.qc_metrics = Dict(:a => 5)
+    @test prof.qc_metrics[:a] == 5
 
-    @test repr(prof) == "OmicsProfile (nvar = 100):\n    var: index, A, B\n    layers: a, b, count\n    pipeline: qc_metrics => normalize => log_transform"
+    @test repr(prof) == "OmicsProfile (nvar = 100):\n    var: index, A, B\n    varm: pcs\n    layers: a, b, count\n    pipeline: qc_metrics => normalize => log_transform"
 
-    @test vec(geneexpr(prof, 50)) == data[50, :]
-    @test vec(geneexpr(prof, 50, :a)) == prof.layers[:a][50, :]
+    @test vec(geneexpr(prof, "50")) == data[50, :]
+    @test vec(geneexpr(prof, "50", :a)) == prof.layers[:a][50, :]
+
+    # indexing
+    prof2 = prof[1:50, :]
+    @test prof2.count == prof.count[1:50, :]
+
+    idx = rand([false,true], ngenes)
+    prof3 = prof[idx, :]
+    @test prof3.count == prof.count[idx, :]
+    @test prof3.var == prof.var[idx, :]
 end
