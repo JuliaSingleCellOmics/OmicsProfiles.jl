@@ -21,7 +21,6 @@ export
     # omicsprofile
     AbstractProfile,
     OmicsProfile,
-    countmatrix,
     nrow,
     ncol,
     nvar,

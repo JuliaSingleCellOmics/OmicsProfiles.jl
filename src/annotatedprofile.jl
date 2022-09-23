@@ -54,11 +54,11 @@ function Profile(countmat::AbstractMatrix, omicsname, var::DataFrame, obs::DataF
     return AnnotatedProfile(p, omicsname, obs, obsindex)
 end
 
+omicsnames(p::AnnotatedProfile) = keys(getfield(p, :omics))
 obsnames(p::AnnotatedProfile) = names(p.obs)
 varnames(p::AnnotatedProfile, omicsname::Symbol) = varnames(p.omics[omicsname])
 layernames(p::AnnotatedProfile, omicsname::Symbol) = layernames(p.omics[omicsname])
-omicsnames(p::AnnotatedProfile) = keys(p.omics)
-countmatrix(p::AnnotatedProfile, omicsname::Symbol) = countmatrix(p.omics[omicsname])
+pipelinenames(p::AnnotatedProfile) = keys(getfield(p, :pipeline))
 
 nvar(p::AnnotatedProfile, omicsname::Symbol) = nvar(p.omics[omicsname])
 nobs(p::AnnotatedProfile) = nrow(p.obs)
@@ -81,18 +81,50 @@ end
 Base.copy(p::AnnotatedProfile) = AnnotatedProfile(copy(p.omics), copy(p.obs),
     Ref(getobsindex(p)), copy(p.obsm), copy(p.obsgraphs), copy(p.pipeline))
 
-getobsindex(p::AnnotatedProfile) = p.obsindex[]
+getobsindex(p::AnnotatedProfile) = getfield(p, :obsindex)[]
 
 function setobsindex!(p::AnnotatedProfile, index::Symbol)
     not_unique = nonunique(p.obs, index)
     any(not_unique) && throw(ArgumentError("not unique obs index at rows: $(findall(not_unique))."))
-    p.obsindex[] = index
+    getfield(p, :obsindex)[] = index
     return p
 end
 
-getpipeline(p::AnnotatedProfile, i::Symbol) = p.pipeline[i]
+getpipeline(p::AnnotatedProfile, i::Symbol) = getfield(p, :pipeline)[i]
 
-function setpipeline!(p::AnnotatedProfile, x, i::Symbol)
-    p.pipeline[i] = x
+function setpipeline!(p::AnnotatedProfile, i::Symbol, x)
+    getfield(p, :pipeline)[i] = x
     return p
+end
+
+function Base.getproperty(p::AnnotatedProfile, name::Symbol)
+    if name == :obsindex
+        return getobsindex(p)
+    elseif name in omicsnames(p)
+        return getfield(p, :omics)[name]
+    elseif name in keys(getfield(p, :obsm))
+        return getfield(p, :obsm)[name]
+    elseif name in keys(getfield(p, :obsgraphs))
+        return getfield(p, :obsgraphs)[name]
+    elseif name in keys(getfield(p, :pipeline))
+        return getpipeline(p, name)
+    else
+        return getfield(p, name)
+    end
+end
+
+function Base.setproperty!(p::AnnotatedProfile, name::Symbol, x)
+    if name == :obsindex
+        return setobsindex!(p, x)
+    elseif name in keys(getfield(p, :obsm))
+        getfield(p, :obsm)[name] = x
+        return p
+    elseif name in keys(getfield(p, :obsgraphs))
+        getfield(p, :obsgraphs)[name] = x
+        return p
+    elseif name in pipelinenames(p)
+        return setpipeline!(p, name, x)
+    else
+        return setfield!(p, name, x)
+    end
 end
