@@ -2,11 +2,12 @@ module OmicsProfiles
 
 using LinearAlgebra
 using SparseArrays
+using Mmap
 
-using DataFrames
+using DataFrames, CSV
 using DataStructures
 using Graphs, SimpleWeightedGraphs
-using TranscodingStreams
+using TranscodingStreams, CodecZlib
 
 import Base: ==
 import DataFrames: nrow, ncol
@@ -18,6 +19,7 @@ const FEATURE_COLS = [:featurekey, :featurename, :featuretype, :chromosome, :fea
 export
     # io
     read_mtx,
+    read_csv,
     read_features,
     read_barcodes,
     read_genes,

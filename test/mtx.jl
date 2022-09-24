@@ -1,5 +1,5 @@
 @testset "mtx" begin
-    mtx_filename = joinpath(OmicsProfiles.PROJECT_PATH, "test", "test.mtx")
+    mtx_filename = joinpath(TEST_PATH, "data", "test.mtx")
     res = sparse(
         [5, 4, 1, 2, 6],
         [1, 5, 1, 4, 7],

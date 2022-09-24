@@ -1,0 +1,20 @@
+featurekey	featurename	featuretype	chromosome	featurestart	featureend	isgene	genus_species
+ENSG00000000003	TSPAN6	protein_coding	chrX	100627109	100639991	True	Homo sapiens
+ENSG00000000005	TNMD	protein_coding	chrX	100584802	100599885	True	Homo sapiens
+ENSG00000000419	DPM1	protein_coding	chr20	50934867	50958555	True	Homo sapiens
+ENSG00000000457	SCYL3	protein_coding	chr1	169849631	169894267	True	Homo sapiens
+ENSG00000000460	C1orf112	protein_coding	chr1	169662007	169854080	True	Homo sapiens
+ENSG00000000938	FGR	protein_coding	chr1	27612064	27635277	True	Homo sapiens
+ENSG00000000971	CFH	protein_coding	chr1	196651878	196747504	True	Homo sapiens
+ENSG00000001036	FUCA2	protein_coding	chr6	143494811	143511690	True	Homo sapiens
+ENSG00000001084	GCLC	protein_coding	chr6	53497341	53616970	True	Homo sapiens
+ENSG00000001167	NFYA	protein_coding	chr6	41072945	41099976	True	Homo sapiens
+ENSG00000001460	STPG1	protein_coding	chr1	24356999	24416934	True	Homo sapiens
+ENSG00000001461	NIPAL3	protein_coding	chr1	24415794	24472976	True	Homo sapiens
+ENSG00000001497	LAS1L	protein_coding	chrX	65512582	65534775	True	Homo sapiens
+ENSG00000001561	ENPP4	protein_coding	chr6	46129993	46146699	True	Homo sapiens
+ENSG00000001617	SEMA3F	protein_coding	chr3	50155045	50189075	True	Homo sapiens
+ENSG00000001626	CFTR	protein_coding	chr7	117465784	117715971	True	Homo sapiens
+ENSG00000001629	ANKIB1	protein_coding	chr7	92246234	92401384	True	Homo sapiens
+ENSG00000001630	CYP51A1	protein_coding	chr7	92112151	92142952	True	Homo sapiens
+ENSG00000001631	KRIT1	protein_coding	chr7	92198969	92246166	True	Homo sapiens

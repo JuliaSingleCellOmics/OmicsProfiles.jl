@@ -1,7 +1,6 @@
 read_mtx(filename::String) = mmread(filename)
 
-read_csv(file, delim::Char, header::Vector{Symbol}) =
-    CSV.File(file; delim=delim, header=header) |> DataFrame
+read_csv(file, delim::Char, header) = CSV.File(file; delim=delim, header=header) |> DataFrame
 
 function read_csv(filename::String; delim=nothing, header::Vector{Symbol}=Symbol[])
     header = isempty(header) ? 1 : header
