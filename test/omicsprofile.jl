@@ -14,7 +14,7 @@
     @test maximum(prof) == 10
     @test minimum(prof) == 0
     @test size(prof) == (ngenes, ncells)
-    @test axes(prof) == (Base.OneTo(ngenes), Base.OneTo(ncells))
+    @test Base.axes(prof) == (Base.OneTo(ngenes), Base.OneTo(ncells))
 
     prof2 = copy(prof)
     @test prof2 !== prof
@@ -37,7 +37,7 @@
     @test collect(layernames(prof)) == [:a, :b, :count]
     @test size(prof.a) == (ngenes, ncells)
     @test size(prof.b) == (ngenes, ngenes)
-    prof.a = prof.count
+    prof.a = collect(prof.count)
     @test prof.a == prof.count
 
     prof.pipeline[:qc_metrics] = Dict(:a => 1)
@@ -52,8 +52,9 @@
 
     @test repr(prof) == "OmicsProfile (nvar = 100):\n    var: index, A, B\n    varm: pcs\n    layers: a, b, count\n    pipeline: qc_metrics => normalize => log_transform"
 
-    @test vec(geneexpr(prof, "50")) == data[50, :]
-    @test vec(geneexpr(prof, "50", :a)) == prof.layers[:a][50, :]
+    @test vec(prof.count["50", :]) == data[50, :]
+    @test vec(prof.a["50", :]) == prof.layers[:a][50, :]
+    @test prof.a[["50", "100"], :] == prof.layers[:a][[50, 100], :]
 
     # indexing
     prof2 = prof[1:50, :]

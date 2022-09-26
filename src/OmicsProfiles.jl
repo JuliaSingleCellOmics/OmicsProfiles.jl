@@ -4,6 +4,7 @@ using LinearAlgebra
 using SparseArrays
 using Mmap
 
+using AxisArrays
 using DataFrames, CSV
 using DataStructures
 using Graphs, SimpleWeightedGraphs
@@ -39,7 +40,6 @@ export
     setlayer!,
     getpipeline,
     setpipeline!,
-    geneexpr,
 
     # annotatedProfile
     AnnotatedProfile,
