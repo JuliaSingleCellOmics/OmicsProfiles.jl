@@ -77,7 +77,7 @@ Base.maximum(p::OmicsProfile) = maximum(p.count)
 Base.minimum(p::OmicsProfile) = minimum(p.count)
 
 Base.size(p::OmicsProfile) = size(p.count)
-Base.axes(p::OmicsProfile) = axes(p.count)
+Base.axes(p::OmicsProfile) = Base.axes(p.count)
 
 getvarindex(p::OmicsProfile) = getfield(p, :varindex)[]
 
@@ -88,7 +88,7 @@ function setvarindex!(p::OmicsProfile, index::Symbol)
     return p
 end
 
-getlayer(p::OmicsProfile, i::Symbol) = getfield(p, :layers)[i]
+getlayer(p::OmicsProfile, i::Symbol) = AxisArray(getfield(p, :layers)[i]; row=p.var[!, p.varindex])
 
 function setlayer!(p::OmicsProfile, i::Symbol, x)
     @assert size(x, 1) == nvar(p)
@@ -101,12 +101,6 @@ getpipeline(p::OmicsProfile, i::Symbol) = getfield(p, :pipeline)[i]
 function setpipeline!(p::OmicsProfile, i::Symbol, x)
     getfield(p, :pipeline)[i] = x
     return p
-end
-
-function geneexpr(p::OmicsProfile, gene_name, layer::Symbol=:count)
-    varindex = getvarindex(p)
-    idx = findall(p.var[!, varindex] .== gene_name)
-    return view(getlayer(p, layer), idx, :)
 end
 
 function Base.getproperty(p::OmicsProfile, name::Symbol)
@@ -148,7 +142,7 @@ function Base.getindex(p::OmicsProfile, inds...)
                 getindex(p.var, inds[1], :), getvarindex(p))
     for name in layernames(p)
         l = getindex(getlayer(p, name), inds[1], :)
-        setlayer!(new_prof, name, l)
+        setlayer!(new_prof, name, parent(l))
     end
     for name in pipelinenames(p)
         pl = copy(getpipeline(p, name))
