@@ -44,4 +44,10 @@
 
     p = Profile(data, :RNA, var, obs)
     @test p isa AnnotatedProfile
+
+    idx = rand([false,true], ncells)
+    # ap2 = ap[:, idx]
+    # @test ap2.RNA.count == ap.RNA.count[:, idx]
+    # @test ap2.RNA.var == ap.RNA.var
+    # @test ap2.obs == ap.obs[idx, :]
 end

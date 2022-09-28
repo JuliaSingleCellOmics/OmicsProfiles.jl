@@ -55,5 +55,6 @@ include("mtx.jl")
 include("io.jl")
 include("omicsprofile.jl")
 include("annotatedprofile.jl")
+include("filter.jl")
 
 end

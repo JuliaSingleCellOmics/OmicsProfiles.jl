@@ -12,6 +12,7 @@ tests = [
     "io",
     "omicsprofile",
     "annotatedprofile",
+    "filter"
 ]
 
 @testset "OmicsProfiles.jl" begin
