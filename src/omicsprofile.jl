@@ -151,6 +151,8 @@ function Base.getindex(p::OmicsProfile, inds...)
     return new_prof
 end
 
+# Base.view(p::OmicsProfile, inds...)
+
 # Base.merge!
 
 # merge
