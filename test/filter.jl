@@ -1,8 +1,8 @@
 @testset "filter" begin
     ngenes, ncells = (100, 500)
-    data = rand(0:10, ngenes, ncells)
+    X = rand(0:10, ngenes, ncells)
     var = DataFrame(genesymbol=1:ngenes, A=rand(ngenes), B=repeat([1], ngenes))
-    prof = OmicsProfile(data, var, :genesymbol)
+    prof = OmicsProfile(X, var, :genesymbol)
     prof.varm[:a] = rand(ngenes, 50)
 
     @testset "OmicsProfile" begin
