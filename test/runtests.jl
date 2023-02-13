@@ -8,7 +8,6 @@ using Test
 const TEST_PATH = @__DIR__
 
 tests = [
-    "mtx",
     "io",
     "omicsprofile",
     "annotatedprofile",

@@ -8,6 +8,7 @@ using AxisArrays
 using DataFrames, CSV
 using DataStructures
 using Graphs, SimpleWeightedGraphs
+using MatrixMarket
 using TranscodingStreams, CodecZlib
 
 import Base: ==
@@ -51,7 +52,6 @@ export
     setobsindex!
 
 
-include("mtx.jl")
 include("io.jl")
 include("omicsprofile.jl")
 include("annotatedprofile.jl")
