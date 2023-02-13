@@ -1,4 +1,4 @@
-read_mtx(filename::String) = mmread(filename)
+read_mtx(filename::String) = MatrixMarket.mmread(filename)
 
 read_csv(file, delim::Char, header) = CSV.File(file; delim=delim, header=header) |> DataFrame
 
