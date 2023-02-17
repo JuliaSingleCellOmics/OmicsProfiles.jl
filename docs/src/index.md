@@ -11,9 +11,9 @@ CurrentModule = OmicsProfiles
 </figure>
 ```
 
-```@index
-```
-
-```@autodocs
-Modules = [OmicsProfiles]
+```@docs
+Profile
+OmicsProfile
+AnnotatedProfile
+read_10x
 ```

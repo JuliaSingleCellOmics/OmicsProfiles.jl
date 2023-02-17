@@ -1,6 +1,8 @@
 using OmicsProfiles
 using Documenter
 
+ENV["DATADEPS_ALWAYS_ACCEPT"] = true
+
 DocMeta.setdocmeta!(OmicsProfiles, :DocTestSetup, :(using OmicsProfiles, DataFrames); recursive=true)
 
 makedocs(;
