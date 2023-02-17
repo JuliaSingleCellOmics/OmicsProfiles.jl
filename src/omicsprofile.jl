@@ -137,6 +137,12 @@ function Base.setproperty!(p::OmicsProfile, name::Symbol, x)
     end
 end
 
+function Base.propertynames(p::OmicsProfile)
+    props = keys(getfield(p, :varm)) ∪ keys(getfield(p, :vargraphs)) ∪ layernames(p) ∪
+        pipelinenames(p)
+    return (:var, :varindex, :varm, :vargraphs, :layers, :pipeline, props...)
+end
+
 function Base.getindex(p::OmicsProfile, inds...)
     new_prof = OmicsProfile(getindex(p.count, inds[1], :),
                 getindex(p.var, inds[1], :), getvarindex(p))
