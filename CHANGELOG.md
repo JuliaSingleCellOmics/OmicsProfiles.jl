@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.1.7]
+
+- improve documentation
+
 ## [0.1.6]
 
 - `OmicsProfile` and `AnnotatedProfile` support `propertynames`
