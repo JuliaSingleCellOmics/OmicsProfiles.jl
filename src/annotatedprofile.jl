@@ -128,3 +128,8 @@ function Base.setproperty!(p::AnnotatedProfile, name::Symbol, x)
         return setfield!(p, name, x)
     end
 end
+
+function Base.propertynames(p::AnnotatedProfile)
+    props = keys(getfield(p, :obsm)) ∪ keys(getfield(p, :obsgraphs)) ∪ pipelinenames(p)
+    return (:omics, :obs, :obsindex, :obsm, :obsgraphs, :pipeline, props...)
+end

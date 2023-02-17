@@ -49,6 +49,8 @@
     @test prof.log_transform[:c] == 3
     prof.qc_metrics = Dict(:a => 5)
     @test prof.qc_metrics[:a] == 5
+    @test propertynames(prof) == (:var, :varindex, :varm, :vargraphs, :layers, :pipeline,
+        :a, :b, :normalize, :qc_metrics, :log_transform, :count, :pcs)
 
     @test repr(prof) == "OmicsProfile (nvar = 100):\n    var: index, A, B\n    varm: pcs\n    layers: a, b, count\n    pipeline: qc_metrics => normalize => log_transform"
 
