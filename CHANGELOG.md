@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.1.6]
+
+- `OmicsProfile` and `AnnotatedProfile` support `propertynames`
+- support `read_10x` to read 10x folder
+
 ## [0.1.5]
 
 - add `filter` for `OmicsProfile` and `AnnotatedProfile`
