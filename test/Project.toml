@@ -1,0 +1,10 @@
+[deps]
+CodecZlib = "944b1d66-785c-5afd-91f1-9de20f533193"
+DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
+SHA = "ea8e919c-243c-51af-8825-aaa63cd721ce"
+SnowyOwl = "c5d12a1c-ebca-44e1-aaa9-03f0dbaa929f"
+SparseArrays = "2f01184e-e22b-5df5-ae63-d93ebab69eaf"
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[compat]
+SnowyOwl = "0.1.5"
