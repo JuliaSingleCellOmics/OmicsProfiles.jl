@@ -16,16 +16,10 @@ import DataFrames: nrow, ncol
 
 const PROJECT_PATH = dirname(@__DIR__)
 const DenseOrSparse = Union{Matrix,SparseMatrixCSC}
-const FEATURE_COLS = [:featurekey, :featurename, :featuretype, :chromosome, :featurestart, :featureend, :isgene, :genus_species]
 
 export
     # io
-    read_mtx,
-    read_csv,
-    read_features,
-    read_barcodes,
-    read_genes,
-    read_cells,
+    read_10x,
 
     # omicsprofile
     AbstractProfile,

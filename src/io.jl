@@ -1,17 +1,10 @@
-read_mtx(filename::String) = MatrixMarket.mmread(filename)
+read_mtx(filename::AbstractString) = MatrixMarket.mmread(filename)
 
 read_csv(file, delim::Char, header) = CSV.File(file; delim=delim, header=header) |> DataFrame
 
-function read_csv(filename::String; delim=nothing, header::Vector{Symbol}=Symbol[])
+function read_csv(filename::AbstractString; delim=nothing, header::Vector{Symbol}=Symbol[])
     header = isempty(header) ? 1 : header
-
-    if isnothing(delim)
-        delim = ','
-    elseif endswith(filename, ".csv") || endswith(filename, r"\.csv\.\w+")
-        delim = ','
-    elseif endswith(filename, ".tsv") || endswith(filename, r"\.tsv\.\w+")
-        delim = '\t'
-    end
+    delim = predict_delim(delim, filename)
 
     if endswith(filename, ".gz")
         file = transcode(GzipDecompressor, Mmap.mmap(filename))
@@ -21,11 +14,73 @@ function read_csv(filename::String; delim=nothing, header::Vector{Symbol}=Symbol
     return read_csv(file, delim, header)
 end
 
-read_features(filename::String, header::Vector{Symbol}=[:ensembleid, :genesymbol, :type]) =
-    read_csv(filename, header=header)
-read_barcodes(filename::String, header::Vector{Symbol}=[:barcode]) =
-    read_csv(filename, header=header)
+predict_delim(delim::Char, filename::AbstractString) = delim
+
+function predict_delim(::Nothing, filename::AbstractString)
+    if occursin(".csv", filename)
+        return ','
+    elseif occursin(".tsv", filename)
+        return '\t'
+    else
+        @warn "extensions of filename $filename is not identified, assign delim = ','"
+        return ','
+    end
+end
+
+read_features(filename::AbstractString) =
+    read_csv(filename, header=[:ensembleid, :genesymbol, :type])
+read_barcodes(filename::AbstractString) =
+    read_csv(filename, header=[:barcode])
+
+find_file(path::AbstractString, infix::AbstractString, exts::AbstractString) =
+    find_file(path, infix, [exts])
+
+function find_file(path::AbstractString, infix::AbstractString, exts::AbstractVector)
+    for filename in readdir(path)
+        for ext in exts
+            if occursin("$infix.$ext", filename)
+                return joinpath(path, filename)
+            end
+        end
+    end
+
+    error("attempt to read $infix.[$(join(exts, '/'))].[gz] file in $path, but file not found.")
+end
+
+function read_10x(path::AbstractString; make_unique::Bool=true, omicsname::Symbol=:RNA,
+    varnames::AbstractVector=[:ensembleid, :genesymbol], obsnames::AbstractVector=[:barcode],
+    varindex::Symbol=:genesymbol, obsindex::Symbol=:barcode)
+    varfile = find_file(path, "genes", ["csv", "tsv"])
+    obsfile = find_file(path, "barcodes", ["csv", "tsv"])
+    exprfile = find_file(path, "matrix", "mtx")
+    var = read_csv(varfile, header=varnames)
+    obs = read_csv(obsfile, header=obsnames)
+    X = SparseMatrixCSC{Float64,UInt32}(read_mtx(exprfile))
+    make_unique && (var = make_index_unique(var, varindex))
+    return Profile(X, omicsname, var, obs, varindex=varindex, obsindex=obsindex)
+end
+
+function make_index_unique(var, varindex::Symbol)
+    # @show nrow(unique(var, [varindex]))
+    var
+end
 
 ## Human Cell Atlas (HCA)
-read_genes(filename::String) = read_csv(filename)
-read_cells(filename::String) = read_csv(filename)
+
+function read_genes(filename::AbstractString, header::Vector{Symbol}=[:featurekey, :featurename,
+        :featuretype, :chromosome, :featurestart, :featureend, :isgene, :genus_species])
+    return read_csv(filename, header=header)
+end
+
+read_cells(filename::AbstractString) = read_csv(filename)
+
+# function read_10x_h5()
+
+# end
+
+# function read_h5ad()
+
+# end
+
+# read_hdf
+# read_loom
