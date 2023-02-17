@@ -12,8 +12,6 @@ Returns a copy of profile `p` containing data from `p` for which `func` returns 
 # Examples
 
 ```jldoctest
-julia> using OmicsProfiles, DataFrames
-
 julia> ngenes, ncells = (100, 500)
 (100, 500)
 

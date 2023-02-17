@@ -1,7 +1,7 @@
 using OmicsProfiles
 using Documenter
 
-DocMeta.setdocmeta!(OmicsProfiles, :DocTestSetup, :(using OmicsProfiles); recursive=true)
+DocMeta.setdocmeta!(OmicsProfiles, :DocTestSetup, :(using OmicsProfiles, DataFrames); recursive=true)
 
 makedocs(;
     modules=[OmicsProfiles],

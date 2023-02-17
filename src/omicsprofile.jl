@@ -13,8 +13,6 @@ abstract type AbstractProfile end
 # Examples
 
 ```jldoctest
-julia> using OmicsProfiles, DataFrames
-
 julia> r, c = (100, 500)
 (100, 500)
 
