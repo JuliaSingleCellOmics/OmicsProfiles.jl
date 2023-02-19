@@ -1,3 +1,6 @@
+const HCA_GENES_HEADER = [:featurekey, :featurename, :featuretype, :chromosome,
+    :featurestart, :featureend, :isgene, :genus_species]
+
 read_mtx(filename::AbstractString) = MatrixMarket.mmread(filename)
 
 read_csv(file, delim::Char, header) = CSV.File(file; delim=delim, header=header) |> DataFrame
@@ -27,24 +30,27 @@ function predict_delim(::Nothing, filename::AbstractString)
     end
 end
 
-read_features(filename::AbstractString) =
-    read_csv(filename, header=[:ensembleid, :genesymbol, :type])
-read_barcodes(filename::AbstractString) =
-    read_csv(filename, header=[:barcode])
+find_file(path::AbstractString, infix::AbstractString, ext::AbstractString) =
+    find_file(path, infix, [ext])
 
-find_file(path::AbstractString, infix::AbstractString, exts::AbstractString) =
-    find_file(path, infix, [exts])
+find_file(path::AbstractString, infix::AbstractString, exts::AbstractVector) =
+    find_file(path, [infix], exts)
 
-function find_file(path::AbstractString, infix::AbstractString, exts::AbstractVector)
+find_file(path::AbstractString, infixes::AbstractVector, ext::AbstractString) =
+    find_file(path, infixes, [ext])
+
+function find_file(path::AbstractString, infixes::AbstractVector, exts::AbstractVector)
     for filename in readdir(path)
-        for ext in exts
-            if occursin("$infix.$ext", filename)
-                return joinpath(path, filename)
+        for infix in infixes
+            for ext in exts
+                if occursin("$infix.$ext", filename)
+                    return joinpath(path, filename)
+                end
             end
         end
     end
 
-    error("attempt to read $infix.[$(join(exts, '/'))].[gz] file in $path, but file not found.")
+    error("attempt to read [$(join(infixes, '/'))].[$(join(exts, '/'))].[gz] file in $path, but file not found.")
 end
 
 """
@@ -79,7 +85,7 @@ RNA => OmicsProfile (nvar = 32738):
 function read_10x(path::AbstractString; make_unique::Bool=true, omicsname::Symbol=:RNA,
     varnames::AbstractVector=[:ensembleid, :genesymbol], obsnames::AbstractVector=[:barcode],
     varindex::Symbol=:genesymbol, obsindex::Symbol=:barcode)
-    varfile = find_file(path, "genes", ["csv", "tsv"])
+    varfile = find_file(path, ["genes", "features"], ["csv", "tsv"])
     obsfile = find_file(path, "barcodes", ["csv", "tsv"])
     exprfile = find_file(path, "matrix", "mtx")
     var = read_csv(varfile, header=varnames)
@@ -93,15 +99,6 @@ function make_index_unique(var, varindex::Symbol)
     # @show nrow(unique(var, [varindex]))
     var
 end
-
-## Human Cell Atlas (HCA)
-
-function read_genes(filename::AbstractString, header::Vector{Symbol}=[:featurekey, :featurename,
-        :featuretype, :chromosome, :featurestart, :featureend, :isgene, :genus_species])
-    return read_csv(filename, header=header)
-end
-
-read_cells(filename::AbstractString) = read_csv(filename)
 
 # function read_10x_h5()
 
