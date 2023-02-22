@@ -3,6 +3,10 @@ abstract type AbstractProfile end
 """
     OmicsProfile(countmat, var, varindex; T=float(eltype(countmat)))
 
+A data container preserves single omics data for single cell sequencing analysis. Read count
+data `countmat` and variables/features metadata `var` are retained in the container.
+It records data and progression mainly about variables or features.
+
 # Arguments
 
 - `countmat`: The count matrix for given omics and it will be set to key `:count`.
@@ -13,18 +17,20 @@ abstract type AbstractProfile end
 # Examples
 
 ```jldoctest
-julia> r, c = (100, 500)
+julia> ngenes, ncells = (100, 500)
 (100, 500)
 
-julia> data = rand(0:100, r, c);
+julia> data = rand(0:10, ngenes, ncells);
 
-julia> var = DataFrame(index=1:r, C=rand(r), D=rand(r));
+julia> var = DataFrame(index=1:ngenes, C=rand(ngenes), D=rand(ngenes));
 
 julia> prof = OmicsProfile(data, var, :index)
 OmicsProfile (nvar = 100):
     var: index, C, D
     layers: count
 ```
+
+See also [`AnnotatedProfile`](@ref) for multi-omics data container.
 """
 struct OmicsProfile <: AbstractProfile
     var::DataFrame
