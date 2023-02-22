@@ -5,6 +5,7 @@ using SparseArrays
 using Mmap
 
 using AxisArrays
+using CUDA, Adapt
 using DataFrames, CSV
 using DataStructures
 using Graphs, SimpleWeightedGraphs
@@ -15,11 +16,15 @@ import Base: ==
 import DataFrames: nrow, ncol
 
 const PROJECT_PATH = dirname(@__DIR__)
-const DenseOrSparse = Union{Matrix,SparseMatrixCSC}
+const DenseOrSparse = Union{Matrix,SparseMatrixCSC,CuMatrix}
 
 export
     # io
     read_10x,
+
+    # device
+    tocpu,
+    togpu,
 
     # omicsprofile
     AbstractProfile,
@@ -49,6 +54,7 @@ export
 include("io.jl")
 include("omicsprofile.jl")
 include("annotatedprofile.jl")
+include("device.jl")
 include("filter.jl")
 
 end

@@ -86,7 +86,14 @@ function setvarindex!(p::OmicsProfile, index::Symbol)
     return p
 end
 
-getlayer(p::OmicsProfile, i::Symbol) = AxisArray(getfield(p, :layers)[i]; row=p.var[!, p.varindex])
+function getlayer(p::OmicsProfile, i::Symbol)
+    X = getfield(p, :layers)[i]
+    if X isa CuArray
+        return X
+    else
+        return AxisArray(X; row=p.var[!, p.varindex])
+    end
+end
 
 function setlayer!(p::OmicsProfile, i::Symbol, x)
     @assert size(x, 1) == nvar(p)
