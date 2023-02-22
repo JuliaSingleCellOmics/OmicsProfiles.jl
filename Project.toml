@@ -4,8 +4,10 @@ authors = ["Yueh-Hua Tu"]
 version = "0.1.7"
 
 [deps]
+Adapt = "79e6a3ab-5dfb-504d-930d-738a2a938a0e"
 AxisArrays = "39de3d68-74b9-583c-8d2d-e117c070f3a9"
 CSV = "336ed68f-0bac-5ca0-87d4-7b16caf5d00b"
+CUDA = "052768ef-5323-5732-b1bb-66c8b64840ba"
 CodecZlib = "944b1d66-785c-5afd-91f1-9de20f533193"
 DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
 DataStructures = "864edb3b-99cc-5e75-8d2d-829cb0a9cfe8"
@@ -18,8 +20,10 @@ SparseArrays = "2f01184e-e22b-5df5-ae63-d93ebab69eaf"
 TranscodingStreams = "3bb67fe8-82b1-5028-8e26-92a6c54297fa"
 
 [compat]
+Adapt = "3"
 AxisArrays = "0.4"
 CSV = "0.10"
+CUDA = "4"
 CodecZlib = "0.7"
 DataFrames = "1"
 DataStructures = "0.18"
