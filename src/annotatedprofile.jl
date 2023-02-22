@@ -2,6 +2,11 @@
     AnnotatedProfile(omics, obs, obsindex)
     AnnotatedProfile(op, omicsname, obs, obsindex)
 
+A data container preserves multi-omics data for single cell sequencing analysis. Multi-omics
+`omics` in dictionary or, in separation, single omics `op` with its name `omicsname` and
+observations metadata `obs` are retained in the container. It records data and progression
+mainly about observations.
+
 # Arguments
 
 - `omics::Dict{Symbol,OmicsProfile}`: A collection of omics profile with their names in keys.
@@ -9,6 +14,30 @@
 - `omicsname::Symbol`: The name of given `OmicsProfile`.
 - `obs::DataFrame`: The dataframe contains meta information for observations.
 - `obsindex::Symbol`: The index of dataframe `obs`.
+
+# Examples
+
+```jldoctest
+julia> ngenes, ncells = (100, 500)
+(100, 500)
+
+julia> data = rand(0:10, ngenes, ncells);
+
+julia> var = DataFrame(genesymbol=1:ngenes);
+
+julia> obs = DataFrame(barcode=1:ncells);
+
+julia> omic = OmicsProfile(data, var, :genesymbol);
+
+julia> ap = AnnotatedProfile(omic, :RNA, obs, :barcode)
+AnnotatedProfile (nobs = 500):
+    obs: barcode
+RNA => OmicsProfile (nvar = 100):
+    var: genesymbol
+    layers: count
+```
+
+See also [`Profile`](@ref) for routine use and [`OmicsProfile`](@ref) for single omics data container.
 """
 struct AnnotatedProfile <: AbstractProfile
     omics::Dict{Symbol,OmicsProfile}
@@ -33,7 +62,7 @@ function AnnotatedProfile(p::OmicsProfile, omicsname, obs::DataFrame, obsindex::
 end
 
 """
-    Profile(countmat, omicsname, var, obs; varindex=:genesymbol, obsindex::Symbol=:barcode,
+    Profile(countmat, omicsname, var, obs; varindex=:genesymbol, obsindex=:barcode,
             T=float(eltype(countmat)))
 
 Constructor for establishing `AnnotatedProfile` with a `OmicsProfile` inside.
@@ -47,6 +76,29 @@ Constructor for establishing `AnnotatedProfile` with a `OmicsProfile` inside.
 - `varindex::Symbol`: The index of dataframe `var`.
 - `obsindex::Symbol`: The index of dataframe `obs`.
 - `T`: Element type of `countmat`.
+
+# Examples
+
+```jldoctest
+julia> ngenes, ncells = (100, 500)
+(100, 500)
+
+julia> data = rand(0:10, ngenes, ncells);
+
+julia> var = DataFrame(genesymbol=1:ngenes);
+
+julia> obs = DataFrame(barcode=1:ncells);
+
+julia> prof = Profile(data, :RNA, var, obs, varindex=:genesymbol, obsindex=:barcode)
+AnnotatedProfile (nobs = 500):
+    obs: barcode
+RNA => OmicsProfile (nvar = 100):
+    var: genesymbol
+    layers: count
+```
+
+See also [`AnnotatedProfile`](@ref) for multi-omics data container and [`OmicsProfile`](@ref)
+for single omics data container.
 """
 function Profile(countmat::AbstractMatrix, omicsname, var::DataFrame, obs::DataFrame;
         varindex::Symbol=:genesymbol, obsindex::Symbol=:barcode, T=float(eltype(countmat)))
