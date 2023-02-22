@@ -1,7 +1,7 @@
 name = "OmicsProfiles"
 uuid = "2c1f4335-9aeb-47fb-ad11-94d99429346c"
 authors = ["Yueh-Hua Tu"]
-version = "0.1.7"
+version = "0.2.0"
 
 [deps]
 Adapt = "79e6a3ab-5dfb-504d-930d-738a2a938a0e"

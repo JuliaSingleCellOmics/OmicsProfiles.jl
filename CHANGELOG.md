@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.2.0]
+
+- Support `OmicsProfile` and `AnnotatedProfile` moving to GPU by `tocpu` and `togpu`
+- Support reading distinct name of feature files, e.g. `genes.csv` and `features.csv`
+
 ## [0.1.7]
 
 - improve documentation
